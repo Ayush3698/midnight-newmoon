@@ -1,0 +1,26 @@
+pragma language_version >= 0.23;
+
+import CompactStandardLibrary;
+
+export ledger yesCount: Counter;
+export ledger noCount: Counter;
+export ledger totalVotes: Counter;
+
+witness voteChoice(): Boolean;
+
+export circuit castVote(): [] {
+    const choice = voteChoice();
+    const revealedChoice = disclose(choice);
+
+    if (revealedChoice) {
+        yesCount.increment(1);
+    } else {
+        noCount.increment(1);
+    }
+
+    totalVotes.increment(1);
+}
+
+export circuit getResults(): [Uint<64>, Uint<64>, Uint<64>] {
+    return [yesCount.read(), noCount.read(), totalVotes.read()];
+}
